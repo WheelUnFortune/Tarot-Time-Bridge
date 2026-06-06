@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Dark mystical theme */
+    --bg-0: 260 50% 8%;       /* #0c0820 */
+    --bg-1: 257 47% 14%;      /* #14102e */
+    --bg-2: 256 47% 19%;      /* #1c1740 */
+    --bg-3: 252 47% 27%;      /* #251e54 */
+    --line: 252 38% 28%;      /* #2e2666 */
+    --ink-0: 36 47% 92%;      /* #f5efe0 */
+    --ink-1: 268 25% 84%;     /* #d6cce0 */
+    --ink-2: 252 18% 65%;     /* #9b94b8 */
+    --ink-3: 250 15% 48%;     /* #6f6a8c */
+    --gold: 46 65% 52%;       /* #d4af37 */
+    --gold-soft: 44 76% 65%;  /* #e8c870 */
+    --violet: 256 82% 75%;    /* #a48cf2 */
+    --rose: 333 73% 70%;      /* #e07aa0 */
+    --green: 152 73% 67%;     /* #6ee7a8 */
+    --amber: 36 88% 70%;      /* #f6c270 */
+    --danger: 348 82% 69%;    /* #ef6f8b */
+
+    /* shadcn-compatible tokens (semantic) */
+    --background: var(--bg-0);
+    --foreground: var(--ink-1);
+    --card: 252 47% 14%;
+    --card-foreground: var(--ink-1);
+    --popover: var(--bg-2);
+    --popover-foreground: var(--ink-0);
+    --primary: var(--gold);
+    --primary-foreground: 260 50% 8%;
+    --secondary: var(--bg-3);
+    --secondary-foreground: var(--ink-0);
+    --muted: var(--bg-2);
+    --muted-foreground: var(--ink-2);
+    --accent: var(--violet);
+    --accent-foreground: var(--ink-0);
+    --destructive: var(--danger);
+    --destructive-foreground: var(--ink-0);
+    --border: var(--line);
+    --input: var(--line);
+    --ring: var(--violet);
+    --radius: 0.875rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html, body, #root {
+    @apply h-full;
+  }
+
+  body {
+    @apply text-ink-1 antialiased;
+    background:
+      radial-gradient(1200px 800px at 20% -10%, hsla(256, 82%, 75%, 0.18), transparent 60%),
+      radial-gradient(900px 700px at 100% 0%, hsla(46, 65%, 52%, 0.10), transparent 60%),
+      linear-gradient(180deg, hsl(var(--bg-0)), hsl(var(--bg-1)));
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+
+  h1, h2, h3 {
+    @apply font-serif text-ink-0 tracking-tight;
+  }
+
+  /* Date/time inputs need mono */
+  input[type="date"],
+  input[type="time"] {
+    @apply font-mono;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}

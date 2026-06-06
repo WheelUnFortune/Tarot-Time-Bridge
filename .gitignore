@@ -6,7 +6,24 @@ Thumbs.db
 *.swp
 *~
 
-# Don't commit build artifacts (none today, but future-proofing)
+# Node
 node_modules/
+
+# Build output
 dist/
+dist-ssr/
 *.log
+
+# Misc
+.env
+.env.local
+.env.*.local
+
+# Vite cache
+.vite/
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Archive of original vanilla files (kept for reference during migration)
+.archive/
