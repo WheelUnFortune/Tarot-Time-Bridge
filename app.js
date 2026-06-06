@@ -658,54 +658,42 @@
 
   /** Returns cssClass + html for a (date, zone) cell */
   function describeDayInZone(date, zone) {
-    // For each of the 7 day cells (in myTz calendar), figure out what
-    // weekday it is *in that zone* and what's open / booked.
-    const myDateUtcMidnight = new Date(
-      Date.UTC(
-        date.getFullYear(),
-        date.getMonth(),
-        date.getDate()
-      )
+    // The cell represents "my day D" — the calendar day in myTz.
+    // We compare bookings by UTC range, NOT by calendar-day-in-zone
+    // match, because Madrid's day and Chicago's day don't align.
+    //
+    // 1. Find the UTC instant of "midnight of day D in myTz"
+    //    and "midnight of day D+1 in myTz".
+    // 2. Any booking whose UTC instant falls in that range belongs
+    //    in this cell.
+    // 3. Render the booking at its time-as-seen-in-this-zone.
+
+    const myMidnightUtc = localDateToUtcWall(state.myTz, startOfLocalDay(date));
+    const myNextMidnightUtc = localDateToUtcWall(
+      state.myTz,
+      new Date(startOfLocalDay(date).getTime() + 86400000)
     );
-    // What weekday is this in the target zone?
+
+    // What weekday is "my day D" when viewed from this zone?
+    // Use the UTC instant of my midnight to ask the zone what weekday it is.
     const dowStr = new Intl.DateTimeFormat("en-US", {
       timeZone: zone,
       weekday: "short",
-    }).format(myDateUtcMidnight);
+    }).format(myMidnightUtc);
     const dowMap = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
     const dow = dowMap[dowStr];
-
     const ranges = state.hours[dow] || [];
     const open = ranges.length > 0;
 
-    // Bookings whose UTC instant falls inside the day-in-this-zone
-    // Easier: get the yyyy-mm-dd string for the cell's date in this zone,
-    // and compare to the booking's date (stored in my tz). But bookings
-    // store myTz date+time → we need to convert each booking to the zone
-    // and check if it lands on the cell's date.
-    const zoneDateStr = new Intl.DateTimeFormat("en-CA", {
-      timeZone: zone,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(myDateUtcMidnight);
-
-    const todaysBookings = state.bookings
-      .map((b) => {
-        const utc = zonedTimeToUtc(b.date, b.time, state.myTz);
-        const bd = new Intl.DateTimeFormat("en-CA", {
-          timeZone: zone,
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-        }).format(utc);
-        const bt = fmtTimeInZone(utc, zone);
-        return { ...b, utc, zoneDate: bd, zoneTime: bt };
-      })
-      .filter((b) => b.zoneDate === zoneDateStr);
+    const inRange = state.bookings
+      .map((b) => ({ ...b, utc: zonedTimeToUtc(b.date, b.time, state.myTz) }))
+      .filter((b) => b.utc >= myMidnightUtc && b.utc < myNextMidnightUtc);
 
     let cssClass = open ? "open" : "";
-    let titleParts = [`${zoneToLabel(zone)}`, `${dowStr}`];
+    const titleParts = [
+      `${zoneToLabel(zone)}`,
+      `Your day ${formatHumanDate(date)} → ${dowStr} in this zone`,
+    ];
     if (open) {
       titleParts.push(
         `Hours: ${ranges.map((r) => `${r.from}–${r.to}`).join(", ")} (your time)`
@@ -713,30 +701,62 @@
     } else {
       titleParts.push("Closed (your time)");
     }
+
     let html = "";
     if (open) {
       html = ranges
-        .map(
-          (r) =>
-            `<span class="label">${r.from}–${r.to}</span>`
-        )
+        .map((r) => `<span class="label">${r.from}–${r.to}</span>`)
         .join("");
     }
-    if (todaysBookings.length > 0) {
+    if (inRange.length > 0) {
       cssClass = "booked";
-      html = todaysBookings
-        .map(
-          (b) =>
-            `<span class="label">${b.zoneTime} ${b.name}${
-              b.tz === zone ? "" : ` (${b.tz.split("/").pop()})`
-            }</span>`
-        )
+      html = inRange
+        .map((b) => {
+          const t = fmtTimeInZone(b.utc, zone);
+          const where =
+            b.tz === zone ? "" : ` (${b.tz.split("/").pop().replace(/_/g, " ")})`;
+          return `<span class="label">${t} · ${escapeHtml(b.name)}${where}</span>`;
+        })
         .join("");
       titleParts.push(
-        `Bookings: ${todaysBookings.map((b) => `${b.name} @ ${b.zoneTime}`).join("; ")}`
+        `Bookings: ${inRange
+          .map(
+            (b) => `${b.name} @ ${fmtTimeInZone(b.utc, zone)} (${zone})`
+          )
+          .join("; ")}`
       );
     }
     return { cssClass, html, title: titleParts.join("\n") };
+  }
+
+  function startOfLocalDay(d) {
+    const x = new Date(d);
+    x.setHours(0, 0, 0, 0);
+    return x;
+  }
+
+  function localDateToUtcWall(tz, localDate) {
+    // Treat localDate's Y/M/D/H/M/S fields (in host-local time) as a
+    // wall-clock string, and find the UTC instant when that wall clock
+    // occurs in `tz`. In practice (host TZ == myTz) this is just
+    // `localDate.getTime()` modulo offset, but we go through the same
+    // path the bookings use, so DST and tz data stay consistent.
+    const pad = (n) => String(n).padStart(2, "0");
+    const dateStr = `${localDate.getFullYear()}-${pad(
+      localDate.getMonth() + 1
+    )}-${pad(localDate.getDate())}`;
+    const timeStr = `${pad(localDate.getHours())}:${pad(
+      localDate.getMinutes()
+    )}:${pad(localDate.getSeconds())}`;
+    return zonedTimeToUtc(dateStr, timeStr, tz);
+  }
+
+  function formatHumanDate(d) {
+    return new Intl.DateTimeFormat(undefined, {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+    }).format(d);
   }
 
   // ─────────── Bookings ───────────
