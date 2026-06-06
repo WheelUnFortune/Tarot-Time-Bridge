@@ -1,0 +1,12 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*~
+
+# Don't commit build artifacts (none today, but future-proofing)
+node_modules/
+dist/
+*.log
