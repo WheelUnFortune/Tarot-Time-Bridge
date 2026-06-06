@@ -135,7 +135,7 @@
       hour: "2-digit",
       minute: "2-digit",
       second: "2-digit",
-      hour12: false,
+      hour12: true,
     });
     const parts = fmt.formatToParts(guess).reduce((acc, p) => {
       if (p.type !== "literal") acc[p.type] = p.value;
@@ -165,7 +165,7 @@
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
-      hour12: false,
+      hour12: true,
       ...opts,
     }).format(date);
   }
@@ -175,7 +175,7 @@
       timeZone: tz,
       hour: "2-digit",
       minute: "2-digit",
-      hour12: false,
+      hour12: true,
     }).format(date);
   }
 
@@ -203,9 +203,16 @@
     return part ? part.value.replace("GMT", "UTC") : "";
   }
 
+  /** Override labels for IANA zones that cover multiple well-known cities. */
+  const ZONE_LABELS = {
+    "America/Chicago": "Chicago / Dallas",
+    "America/New_York": "New York / Atlanta",
+  };
+
   /** Pretty-print a city name from an IANA zone: "America/Chicago" → "Chicago" */
   function zoneToLabel(zone) {
     if (!zone) return "";
+    if (ZONE_LABELS[zone]) return ZONE_LABELS[zone];
     const parts = zone.split("/");
     let label = parts[parts.length - 1].replace(/_/g, " ");
     if (parts.length > 1 && parts[0] === "America" && parts[1] === "Argentina") {
@@ -391,7 +398,7 @@
       weekday: "short",
       hour: "2-digit",
       minute: "2-digit",
-      hour12: false,
+      hour12: true,
     });
     const parts = fmt.formatToParts(utcDate).reduce((acc, p) => {
       if (p.type !== "literal") acc[p.type] = p.value;
@@ -816,7 +823,7 @@
           day: "numeric",
           hour: "2-digit",
           minute: "2-digit",
-          hour12: false,
+          hour12: true,
         }).format(utc);
         return `
           <li data-id="${b.id}">
