@@ -248,11 +248,11 @@ button {
   border: 1px solid var(--gold);
   background: linear-gradient(180deg, var(--gold), #b8941f);
   color: #1a1033;
+  font: inherit;
   font-weight: 600;
+  font-size: 0.95rem;
   padding: 0.6rem 1rem;
   border-radius: var(--radius-sm);
-  font: inherit;
-  font-size: 0.95rem;
   letter-spacing: 0.01em;
   transition: transform 0.05s, box-shadow 0.15s, filter 0.15s;
 }
@@ -491,6 +491,10 @@ button.danger:hover {
   border-right: 1px solid var(--line);
   min-height: 64px;
   position: relative;
+  font-family: var(--mono);
+  color: var(--ink-3);
+  font-size: 0.7rem;
+  line-height: 1.25;
 }
 
 .wg-cell:last-child {
@@ -530,13 +534,6 @@ button.danger:hover {
   display: flex;
   align-items: center;
   padding-left: 0.7rem;
-}
-
-.wg-cell {
-  font-family: var(--mono);
-  color: var(--ink-3);
-  font-size: 0.7rem;
-  line-height: 1.25;
 }
 
 .wg-cell.open {

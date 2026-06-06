@@ -1,0 +1,19 @@
+{
+  "name": "tarot-time-bridge",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Timezone converter + booking tool for international tarot clients",
+  "scripts": {
+    "lint": "npm run lint:js && npm run lint:css && npm run lint:html",
+    "lint:js": "eslint .",
+    "lint:css": "stylelint \"**/*.css\"",
+    "lint:html": "htmlhint \"**/*.html\""
+  },
+  "devDependencies": {
+    "eslint": "^9.13.0",
+    "globals": "^15.11.0",
+    "stylelint": "^16.10.0",
+    "stylelint-config-standard": "^36.0.1",
+    "htmlhint": "^1.1.4"
+  }
+}
