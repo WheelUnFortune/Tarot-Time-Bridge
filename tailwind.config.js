@@ -43,6 +43,13 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Surface tones (referenced as `bg-bg-0` .. `bg-bg-3`)
+        bg: {
+          0: "hsl(var(--bg-0))",
+          1: "hsl(var(--bg-1))",
+          2: "hsl(var(--bg-2))",
+          3: "hsl(var(--bg-3))",
+        },
         // Theme accents
         gold: {
           DEFAULT: "hsl(var(--gold))",

@@ -53,6 +53,26 @@
     @apply h-full;
   }
 
+  /* Tell the browser to render native form controls (date/time pickers,
+     scrollbars, autofill) in dark mode so they don't show as white widgets
+     over our dark surface. */
+  html {
+    color-scheme: dark;
+  }
+
+  /* Override browser autofill yellow/white that would clobber the dark input
+     background. */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  textarea:-webkit-autofill,
+  select:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 30px hsl(var(--bg-1)) inset !important;
+    -webkit-text-fill-color: white !important;
+    caret-color: hsl(var(--violet));
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
   body {
     @apply text-ink-1 antialiased;
     background:
