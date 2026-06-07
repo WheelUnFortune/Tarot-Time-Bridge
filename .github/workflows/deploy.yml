@@ -27,7 +27,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: tarot-time-bridge
-        run: npm ci
+        run: npm install --no-audit --no-fund
 
       - name: Build
         working-directory: tarot-time-bridge
