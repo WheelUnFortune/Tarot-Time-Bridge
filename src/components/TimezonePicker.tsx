@@ -64,7 +64,11 @@ export function TimezonePicker({
             <Input
               id={id}
               value={value}
-              onChange={(e) => onChange(e.target.value)}
+              onChange={(e) => {
+                onChange(e.target.value);
+                setSearch(e.target.value);
+                setOpen(true);
+              }}
               onFocus={() => setOpen(true)}
               placeholder={placeholder}
               autoComplete="off"
