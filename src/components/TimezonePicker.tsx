@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { CURATED_ZONES, zoneToLabel } from "@/lib/zones";
-import { isValidZone } from "@/lib/time";
+import { isValidZone, resolveZoneAlias } from "@/lib/time";
 
 interface TimezonePickerProps {
   value: string;
@@ -50,10 +50,16 @@ export function TimezonePicker({
 
   const filtered = useMemo(() => {
     if (!search) return all;
-    const q = search.toLowerCase();
-    return all.filter(
-      (z) => z.toLowerCase().includes(q) || zoneToLabel(z).toLowerCase().includes(q)
-    );
+    const q = search.toLowerCase().trim();
+    if (!q) return all;
+    // If the search matches a known city alias, surface that zone at the top.
+    const aliased = resolveZoneAlias(q);
+    return all.filter((z) => {
+      if (z.toLowerCase().includes(q)) return true;
+      if (zoneToLabel(z).toLowerCase().includes(q)) return true;
+      if (aliased && z === aliased) return true;
+      return false;
+    });
   }, [all, search]);
 
   if (freeText) {
@@ -70,6 +76,14 @@ export function TimezonePicker({
                 setOpen(true);
               }}
               onFocus={() => setOpen(true)}
+              onBlur={() => {
+                // Auto-resolve common city aliases (e.g. "madrid" → "Europe/Madrid")
+                // so the user doesn't have to click the dropdown if they don't want to.
+                const resolved = resolveZoneAlias(value);
+                if (resolved && resolved !== value) {
+                  onChange(resolved);
+                }
+              }}
               placeholder={placeholder}
               autoComplete="off"
               className="pr-9"
@@ -87,7 +101,7 @@ export function TimezonePicker({
             </PopoverTrigger>
           </div>
           <PopoverContent
-            className="w-[var(--radix-popover-trigger-width)] p-0"
+            className="w-[var(--radix-popover-trigger-width)] min-w-[20rem] max-w-[calc(100vw-2rem)] p-0"
             align="start"
             onOpenAutoFocus={(e) => e.preventDefault()}
           >
@@ -164,7 +178,7 @@ export function TimezonePicker({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+      <PopoverContent className="w-[--radix-popover-trigger-width] min-w-[20rem] max-w-[calc(100vw-2rem)] p-0">
         <Command>
           <CommandInput placeholder="Search timezones…" />
           <CommandList>

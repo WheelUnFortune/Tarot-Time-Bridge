@@ -153,6 +153,76 @@ export const ZONE_LABELS: Record<string, string> = {
   "America/New_York": "New York / Atlanta",
 };
 
+/**
+ * Common city-name aliases that resolve to canonical IANA zones.
+ * Lets the freeText picker treat "madrid" the same as "Europe/Madrid".
+ * Keys are lowercased and trimmed before lookup.
+ */
+export const ZONE_ALIASES: Record<string, string> = {
+  // Europe
+  "madrid": "Europe/Madrid",
+  "london": "Europe/London",
+  "paris": "Europe/Paris",
+  "berlin": "Europe/Berlin",
+  "lisbon": "Europe/Lisbon",
+  "athens": "Europe/Athens",
+  "istanbul": "Europe/Istanbul",
+  "moscow": "Europe/Moscow",
+  "rome": "Europe/Rome",
+  "amsterdam": "Europe/Amsterdam",
+  "barcelona": "Europe/Madrid",
+  "valencia": "Europe/Madrid",
+  "sevilla": "Europe/Madrid",
+  // Americas
+  "new york": "America/New_York",
+  "nyc": "America/New_York",
+  "manhattan": "America/New_York",
+  "brooklyn": "America/New_York",
+  "chicago": "America/Chicago",
+  "dallas": "America/Chicago",
+  "atlanta": "America/New_York",
+  "denver": "America/Denver",
+  "los angeles": "America/Los_Angeles",
+  "la": "America/Los_Angeles",
+  "san francisco": "America/Los_Angeles",
+  "sf": "America/Los_Angeles",
+  "seattle": "America/Los_Angeles",
+  "toronto": "America/Toronto",
+  "vancouver": "America/Vancouver",
+  "mexico city": "America/Mexico_City",
+  "bogota": "America/Bogota",
+  "sao paulo": "America/Sao_Paulo",
+  "buenos aires": "America/Argentina/Buenos_Aires",
+  // Africa & Middle East
+  "lagos": "Africa/Lagos",
+  "cairo": "Africa/Cairo",
+  "johannesburg": "Africa/Johannesburg",
+  "dubai": "Asia/Dubai",
+  // Asia
+  "kolkata": "Asia/Kolkata",
+  "mumbai": "Asia/Kolkata",
+  "delhi": "Asia/Kolkata",
+  "bangkok": "Asia/Bangkok",
+  "singapore": "Asia/Singapore",
+  "hong kong": "Asia/Hong_Kong",
+  "tokyo": "Asia/Tokyo",
+  "seoul": "Asia/Seoul",
+  "beijing": "Asia/Shanghai",
+  "shanghai": "Asia/Shanghai",
+  // Oceania
+  "sydney": "Australia/Sydney",
+  "perth": "Australia/Perth",
+  "melbourne": "Australia/Sydney",
+  "auckland": "Pacific/Auckland",
+  "honolulu": "Pacific/Honolulu",
+};
+
+/** If `input` is a known city alias, return the canonical IANA zone. */
+export function resolveZoneAlias(input: string | null | undefined): string | null {
+  if (!input) return null;
+  return ZONE_ALIASES[input.trim().toLowerCase()] ?? null;
+}
+
 /** Pretty-print a city name from an IANA zone: "America/Chicago" → "Chicago" */
 export function zoneToLabel(zone: string): string {
   if (!zone) return "";
