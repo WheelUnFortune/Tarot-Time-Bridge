@@ -26,16 +26,9 @@ jobs:
           node-version: 22
 
       - name: Install dependencies
-        working-directory: tarot-time-bridge
-        run: |
-          pwd
-          ls -la
-          node --version
-          npm --version
-          npm install --no-audit --no-fund 2>&1 | tail -50
+        run: npm install --no-audit --no-fund
 
       - name: Build
-        working-directory: tarot-time-bridge
         env:
           NODE_ENV: production
         run: npm run build
@@ -46,7 +39,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: tarot-time-bridge/dist
+          path: dist
 
   deploy:
     needs: build
